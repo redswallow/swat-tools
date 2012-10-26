@@ -19,11 +19,14 @@ def read_xls(filename,index=0):
         cell_elements[task_id]=title
     return cell_elements
 
+def diff(xls1,xls2):
+    #a_diff_b(xls1,xls2)
+    a_diff_b(xls2,xls1)
 
-def diff(dict1,dict2):
+# in a not in b
+def a_diff_b(dict1,dict2):
     for item in dict2:
         if item not in dict1:
-            print item,dict2[item]
             log(item+" "+dict2[item]+'\n')
 
 def log(info):
