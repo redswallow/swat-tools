@@ -1,16 +1,21 @@
-import xlrd
-import urllib2
-import re
-import simplejson as json
-import os 
+import xlrd,urllib2,re,simplejson as json,os,threading,Queue
+from runtime import runTime
+from BeautifulSoup import BeautifulSoup
 
-XLS_FILE="c:\users\yanhong\desktop\grid.xls"
+import numpy as np  
+import matplotlib  
+matplotlib.use('Agg')  
+from matplotlib.pyplot import plot,savefig,figure,title
+
+XLS_FILE="grid.xls"
 INIT_URL="http://sj-sre002.sjc.ebay.com:8080/ex/c/trend"
 EX_URL="http://sj-sre002.sjc.ebay.com:8080/ex/c/trend?trendType=error&poolName=[poolname]&dtOverride=2"
 EX_JSON_URL=EX_URL.replace("trend?", "trend/detailJSON?");
-
+queue=Queue.Queue()
 cell_elements=[]
+lock = threading.Lock()  
 
+@runTime
 def read_xls(filename):
     book = xlrd.open_workbook(filename)
     booksheet = book.sheet_by_index(0)
@@ -26,9 +31,11 @@ def get_error_trend_url(pool_name,title):
     url=EX_URL.replace("[poolname]",pool_name)
     log(url)
 
+@runTime
 def get_error_trend_json(pool_name,title):
      url=EX_JSON_URL.replace("[poolname]",pool_name)
-     #log(pool_name
+     print url
+     #log(pool_name)
      print "url before"
      page=urllib2.urlopen(url).read()
      print "url ok"
@@ -41,7 +48,7 @@ def get_error_trend_json(pool_name,title):
              new_url=INIT_URL+re.findall(r"'(.*?)'",line[0])[0]
              return new_url
 
-def get_image(url):
+def get_chrome_image(url):
     command="chrome "+'"'+url+'"'
     log(command)
     os.system(command)
@@ -49,17 +56,66 @@ def get_image(url):
     #file=open("image.txt","w")
     #file.write(page)
 
+def get_chart_data(url):
+    page=urllib2.urlopen(url).read()
+    charJsonFinder=re.findall('<textarea id=\'chartJson\'>(.*?)</textarea>',page)
+    if charJsonFinder:
+        charJson=eval(charJsonFinder[0].replace('&#034;','\''))
+        data=charJson['d'][0]['y']['v']
+        return data
+    else:
+        return None
+
+def get_image(url,element):
+    if lock.acquire():
+        task_id,error_type,title,pool_name=element
+        image_title=task_id+'_'+title+'_'+pool_name
+        fig = figure()
+        y=get_chart_data(url)
+        x=np.arange(0,len(y),1)
+        plot(x,y,'--*b')  
+        fig.savefig(image_title+'.png')
+        lock.release()
+    
 def log(info):
     print info
     file=open("log.txt","w+")
     file.write(info)
 
+def init_threading():
+    for i in xrange(10):
+        t = ThreadUrl(queue)
+        t.setDaemon(True)
+        t.start() 
+
+class ThreadUrl(threading.Thread):
+    """Threaded Url Grab"""
+    def __init__(self, queue):
+        threading.Thread.__init__(self)
+        self.queue = queue
+
+    def run(self):
+        while True:
+            #grabs task_id,error_type,title,pool_name from queue
+            element=self.queue.get()
+            task_id,error_type,title,pool_name=element
+            #grabs urls of hosts and then grabs chunk of webpage
+            url=get_error_trend_json(pool_name,title)
+            if url is not None: 
+                #get_chrome_image(url)
+                get_image(url,element)
+            #signals to queue job is done
+            self.queue.task_done()
+
 if __name__=='__main__':
+    """create threads"""
+    init_threading()
     cell_elements=read_xls(XLS_FILE)
     for element in cell_elements:
-        if len(element)==4:
-            print element
-            task_id,error_type,title,pool_name=element
-            if task_id=="PDSRV15759452":
-                url=get_error_trend_json(pool_name,title)
-                if url is not None: get_image(url)
+        if element[1]=='SWAT Top10 Errors':
+            #print element
+            #task_id,error_type,title,pool_name=element
+            queue.put(element)
+            #url=get_error_trend_json(pool_name,title)
+            #if url is not None: get_image(url)
+    queue.join()
