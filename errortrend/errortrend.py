@@ -1,5 +1,6 @@
-import xlrd,urllib2,re,simplejson as json,os,threading,Queue
+import xlrd,urllib2,re,simplejson as json,os,time,threading,Queue
 from runtime import runTime
+from logger import log
 from BeautifulSoup import BeautifulSoup
 
 import numpy as np  
@@ -9,7 +10,7 @@ from matplotlib.pyplot import plot,savefig,figure,title
 
 XLS_FILE="grid.xls"
 INIT_URL="http://sj-sre002.sjc.ebay.com:8080/ex/c/trend"
-EX_URL="http://sj-sre002.sjc.ebay.com:8080/ex/c/trend?trendType=error&poolName=[poolname]&dtOverride=2"
+EX_URL="http://sj-sre002.sjc.ebay.com:8080/ex/c/trend?trendType=error&poolName=[poolname]&dtOverride=3"
 EX_JSON_URL=EX_URL.replace("trend?", "trend/detailJSON?");
 queue=Queue.Queue()
 cell_elements=[]
@@ -29,12 +30,12 @@ def read_xls(filename):
 
 def get_error_trend_url(pool_name,title):
     url=EX_URL.replace("[poolname]",pool_name)
-    log(url)
+    log("log.txt",url)
 
 @runTime
 def get_error_trend_json(pool_name,title):
      url=EX_JSON_URL.replace("[poolname]",pool_name)
-     print url
+     #print url
      #log(pool_name)
      print "url before"
      page=urllib2.urlopen(url).read()
@@ -50,7 +51,7 @@ def get_error_trend_json(pool_name,title):
 
 def get_chrome_image(url):
     command="chrome "+'"'+url+'"'
-    log(command)
+    log("log.txt",command)
     os.system(command)
     #page=urllib2.urlopen(url).read()
     #file=open("image.txt","w")
@@ -67,20 +68,23 @@ def get_chart_data(url):
         return None
 
 def get_image(url,element):
-    if lock.acquire():
-        task_id,error_type,title,pool_name=element
-        image_title=task_id+'_'+title+'_'+pool_name
+    task_id,error_type,title,pool_name=element
+    image_title=task_id+' '+title+' '+pool_name
+    y=get_chart_data(url)
+    
+    sumy=0
+    if y:
+        for num in y:sumy+=int(num)
+
+    if sumy<50000:
+        log("traceToClose.txt",'%s %d' % (image_title,sumy))
+
+    if lock.acquire() and y is not None:
         fig = figure()
-        y=get_chart_data(url)
         x=np.arange(0,len(y),1)
         plot(x,y,'--*b')  
         fig.savefig(image_title+'.png')
         lock.release()
-    
-def log(info):
-    print info
-    file=open("log.txt","w+")
-    file.write(info)
 
 def init_threading():
     for i in xrange(10):
