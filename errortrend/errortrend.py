@@ -1,4 +1,5 @@
 import xlrd,urllib2,re,simplejson as json,os,time,threading,Queue
+import getopt,sys
 from runtime import runTime
 from logger import log
 from BeautifulSoup import BeautifulSoup
@@ -83,6 +84,7 @@ def get_image(url,element):
 
     if sumy<50000:
         log("images/%s/traceToClose.txt"%folder,'%s %d\n%s\n' % (image_title,sumy,url))
+        get_chrome_image(url)
 
     if y:
         fig = figure()
@@ -102,6 +104,13 @@ def init():
     global folder
     folder=time.strftime('%Y%m%d_%H%M%S', time.localtime())
     os.makedirs('images/%s'%folder)
+
+    options,remainder=getopt.getopt(sys.argv, 'ws')
+    for opt,arg in options:
+        if opt == '-w':
+            pass
+        if opt == '-s':
+            pass
 
 class ThreadUrl(threading.Thread):
     """Threaded Url Grab"""
@@ -130,8 +139,6 @@ if __name__=='__main__':
     init_threading()
     cell_elements=read_xls(XLS_FILE)
     for element in cell_elements:
-        if element[1]=='SWAT Top10 Errors' and element[4]=='yualiu':
+        if element[1]=='SWAT Top10 Errors': #and element[4]=='yualiu':
             queue.put(element)
-            #url=get_error_trend_json(pool_name,title)
-            #if url is not None: get_image(url)
     queue.join()
