@@ -6,7 +6,7 @@ from BeautifulSoup import BeautifulSoup
 import numpy as np  
 import matplotlib  
 matplotlib.use('Agg')  
-from matplotlib.pyplot import plot,savefig,figure,title
+from matplotlib.pyplot import fill_between,plot,savefig,figure,title
 
 XLS_FILE="grid.xls"
 INIT_URL="http://sj-sre002.sjc.ebay.com:8080/ex/c/trend"
@@ -34,20 +34,21 @@ def get_error_trend_url(pool_name,title):
 
 @runTime
 def get_error_trend_json(pool_name,title):
-     url=EX_JSON_URL.replace("[poolname]",pool_name)
-     #print url
-     #log(pool_name)
-     print "url before"
-     page=urllib2.urlopen(url).read()
-     print "url ok"
-     json_val=json.loads(page)
-     print "loads ok"
-     #file=open("json.txt","w")
-     #file.write(str(json_val))
-     for line in json_val['aaData']:
-         if title in line[0]:
-             new_url=INIT_URL+re.findall(r"'(.*?)'",line[0])[0]
-             return new_url
+    url=EX_JSON_URL.replace("[poolname]",pool_name)
+    #print url
+    #log(pool_name)
+    print "url before"
+    page=urllib2.urlopen(url).read()
+    print "url ok"
+    json_val=json.loads(page)
+    print "loads ok"
+    max_count=0
+    new_url=None
+    for line in json_val['aaData']:
+        if title in line[0] and line[3]>max_count:
+            new_url=INIT_URL+re.findall(r"'(.*?)'",line[0])[0]
+            max_count=line[3]
+    return new_url
 
 def get_chrome_image(url):
     command="chrome "+'"'+url+'"'
@@ -77,20 +78,26 @@ def get_image(url,element):
         for num in y:sumy+=int(num)
 
     if sumy<50000:
-        log("traceToClose.txt",'%s %d' % (image_title,sumy))
+        log("images/%s/traceToClose.txt"%folder,'%s %d\n%s\n' % (image_title,sumy,url))
 
-    if lock.acquire() and y is not None:
+    if y:
         fig = figure()
         x=np.arange(0,len(y),1)
-        plot(x,y,'--*b')  
-        fig.savefig(image_title+'.png')
-        lock.release()
+        color_alpha=str(np.exp(-sumy/50000));
+        plot(x,y,color='k',lw=2)
+        fill_between(x,y,0,color=color_alpha)
+        fig.savefig('images/%s/%s.png'%(folder,image_title))
 
 def init_threading():
     for i in xrange(10):
         t = ThreadUrl(queue)
         t.setDaemon(True)
         t.start() 
+
+def init():
+    global folder
+    folder=time.strftime('%Y%m%d_%H%M%S', time.localtime())
+    os.makedirs('images/%s'%folder)
 
 class ThreadUrl(threading.Thread):
     """Threaded Url Grab"""
@@ -107,11 +114,14 @@ class ThreadUrl(threading.Thread):
             url=get_error_trend_json(pool_name,title)
             if url is not None: 
                 #get_chrome_image(url)
-                get_image(url,element)
+                if lock.acquire():
+                    get_image(url,element)
+                    lock.release()
             #signals to queue job is done
             self.queue.task_done()
 
 if __name__=='__main__':
+    init()
     """create threads"""
     init_threading()
     cell_elements=read_xls(XLS_FILE)
