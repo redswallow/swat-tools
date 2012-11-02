@@ -8,9 +8,12 @@ import matplotlib
 matplotlib.use('Agg')  
 from matplotlib.pyplot import fill_between,plot,savefig,figure,title
 
+"""configuration"""
 XLS_FILE="grid.xls"
 INIT_URL="http://sj-sre002.sjc.ebay.com:8080/ex/c/trend"
-EX_URL="http://sj-sre002.sjc.ebay.com:8080/ex/c/trend?trendType=error&poolName=[poolname]&dtOverride=3"
+EX_URL_H="http://sj-sre002.sjc.ebay.com:8080/ex/c/trend?trendType=error&poolName=[poolname]&dtOverride=2"
+EX_URL_D="http://sj-sre002.sjc.ebay.com:8080/ex/c/trend?trendType=error&poolName=[poolname]&dtOverride=3"
+EX_URL=EX_URL_D
 EX_JSON_URL=EX_URL.replace("trend?", "trend/detailJSON?");
 queue=Queue.Queue()
 cell_elements=[]
@@ -22,10 +25,11 @@ def read_xls(filename):
     booksheet = book.sheet_by_index(0)
     for rows in xrange(1, booksheet.nrows, 1):
         task_id=booksheet.cell_value(rows,0)
+        assignee=booksheet.cell_value(rows,6)
         title=booksheet.cell_value(rows,7)
         title=title.replace(" -- ","--").replace(" --","--");
         if "PDSRV" in task_id:
-            cell_elements.append([task_id]+title.split("--"))
+            cell_elements.append([task_id]+title.split("--")+[assignee])
     return cell_elements
 
 def get_error_trend_url(pool_name,title):
@@ -69,7 +73,7 @@ def get_chart_data(url):
         return None
 
 def get_image(url,element):
-    task_id,error_type,title,pool_name=element
+    task_id,error_type,title,pool_name,assignee=element
     image_title=task_id+' '+title+' '+pool_name
     y=get_chart_data(url)
     
@@ -109,7 +113,7 @@ class ThreadUrl(threading.Thread):
         while True:
             #grabs task_id,error_type,title,pool_name from queue
             element=self.queue.get()
-            task_id,error_type,title,pool_name=element
+            task_id,error_type,title,pool_name,assignee=element
             #grabs urls of hosts and then grabs chunk of webpage
             url=get_error_trend_json(pool_name,title)
             if url is not None: 
@@ -126,9 +130,7 @@ if __name__=='__main__':
     init_threading()
     cell_elements=read_xls(XLS_FILE)
     for element in cell_elements:
-        if element[1]=='SWAT Top10 Errors':
-            #print element
-            #task_id,error_type,title,pool_name=element
+        if element[1]=='SWAT Top10 Errors' and element[4]=='yualiu':
             queue.put(element)
             #url=get_error_trend_json(pool_name,title)
             #if url is not None: get_image(url)
