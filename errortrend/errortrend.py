@@ -79,17 +79,20 @@ def get_image(url,element):
     y=get_chart_data(url)
     
     sumy=0
+    threshold=50000;thresholdFlag=True
     if y:
-        for num in y:sumy+=int(num)
-
-    if sumy<50000:
+        for num in y:
+            if int(num)>threshold: thresholdFlag=False
+            sumy+=int(num)
+    
+    if thresholdFlag:
         log("images/%s/traceToClose.txt"%folder,'%s %d\n%s\n' % (image_title,sumy,url))
-        get_chrome_image(url)
+        #get_chrome_image(url)
 
     if y:
         fig = figure()
         x=np.arange(0,len(y),1)
-        color_alpha=str(np.exp(-sumy/50000));
+        color_alpha=str(np.exp(-sumy/(threshold*7)));
         plot(x,y,color='k',lw=2)
         fill_between(x,y,0,color=color_alpha)
         fig.savefig('images/%s/%s.png'%(folder,image_title))
