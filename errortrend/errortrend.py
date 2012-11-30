@@ -76,26 +76,25 @@ def get_chart_data(url):
 def get_image(url,element):
     task_id,error_type,title,pool_name,assignee=element
     image_title=task_id+' '+title+' '+pool_name
-    y=get_chart_data(url)
+    y=get_chart_data(url) if url else [0]*7 
     
     sumy=0
     threshold=50000;thresholdFlag=True
-    if y:
-        for num in y:
-            if int(num)>threshold: thresholdFlag=False
-            sumy+=int(num)
+    for num in y:
+        if int(num)>threshold: thresholdFlag=False
+        sumy+=int(num)
+    #draw the graphs
+    fig = figure()
+    x=np.arange(0,len(y),1)
+    color_alpha=str(np.exp(-sumy/(threshold*7)));
+    plot(x,y,color='k',lw=2)
+    fill_between(x,y,0,color=color_alpha)
+    fig.savefig('images/%s/%s.png'%(folder,image_title))
     
     if thresholdFlag:
-        log("images/%s/traceToClose.txt"%folder,'%s %d\n%s\n' % (image_title,sumy,url))
+        log("images/%s/traceToClose.txt"%folder,'%s %d\n%s\n%s\n' % (image_title,sumy,url,y))
         #get_chrome_image(url)
 
-    if y:
-        fig = figure()
-        x=np.arange(0,len(y),1)
-        color_alpha=str(np.exp(-sumy/(threshold*7)));
-        plot(x,y,color='k',lw=2)
-        fill_between(x,y,0,color=color_alpha)
-        fig.savefig('images/%s/%s.png'%(folder,image_title))
 
 def init_threading():
     for i in xrange(10):
@@ -128,11 +127,10 @@ class ThreadUrl(threading.Thread):
             task_id,error_type,title,pool_name,assignee=element
             #grabs urls of hosts and then grabs chunk of webpage
             url=get_error_trend_json(pool_name,title)
-            if url is not None: 
-                #get_chrome_image(url)
-                if lock.acquire():
-                    get_image(url,element)
-                    lock.release()
+            #get_chrome_image(url)
+            if lock.acquire():
+                get_image(url,element)
+                lock.release()
             #signals to queue job is done
             self.queue.task_done()
 
