@@ -7,7 +7,7 @@ from BeautifulSoup import BeautifulSoup
 import numpy as np  
 import matplotlib  
 matplotlib.use('Agg')  
-from matplotlib.pyplot import fill_between,plot,savefig,figure,title
+from matplotlib.pyplot import fill_between,plot,savefig,figure,title,ylim
 
 """configuration"""
 XLS_FILE="grid.xls"
@@ -76,7 +76,7 @@ def get_chart_data(url):
 def get_image(url,element):
     task_id,error_type,title,pool_name,assignee=element
     image_title=task_id+' '+title+' '+pool_name
-    y=get_chart_data(url) if url else [0]*7 
+    y=get_chart_data(url) if url else [0]*6 
     
     sumy=0
     threshold=50000;thresholdFlag=True
@@ -86,6 +86,8 @@ def get_image(url,element):
     #draw the graphs
     fig = figure()
     x=np.arange(0,len(y),1)
+    if thresholdFlag:
+        ylim([0,threshold])
     color_alpha=str(np.exp(-sumy/(threshold*7)));
     plot(x,y,color='k',lw=2)
     fill_between(x,y,0,color=color_alpha)
