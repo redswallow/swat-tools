@@ -1,0 +1,3 @@
+2012-11-30 11:20:53 PDSRV15900252 com.ebay.shared.finding.cassini.extended.SortOptionsBuilder$BestMatchSortOptionBuilder$BestMatchParameterExtractor.extractFrom v3buyingsvc2core 77418
+http://sj-sre002.sjc.ebay.com:8080/ex/c/trend?trendType=error&poolName=v3buyingsvc2core&fromDate=2012-11-22+20%3A20&toDate=2012-11-29+20%3A20&poolId=115034&id=1835043&subType=single&title=com.ebay.shared.finding.cassini.extended.SortOptionsBuilder$BestMatchSortOptionBuilder$BestMatchParameterExtractor.extractFrom&dtOverride=3
+

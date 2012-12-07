@@ -1,0 +1,8 @@
+2012-11-30 15:13:52 PDSRV15291224 java.util.concurrent.ThreadPoolExecutor$AbortPolicy.rejectedExecution_RejectedExecutionException cmosprovsvc 0
+None
+[0, 0, 0, 0, 0, 0, 0]
+
+2012-11-30 15:14:28 PDSRV15900252 com.ebay.shared.finding.cassini.extended.SortOptionsBuilder$BestMatchSortOptionBuilder$BestMatchParameterExtractor.extractFrom v3buyingsvc2core 77418
+http://sj-sre002.sjc.ebay.com:8080/ex/c/trend?trendType=error&poolName=v3buyingsvc2core&fromDate=2012-11-23+0%3A14&toDate=2012-11-30+0%3A14&poolId=115034&id=1835043&subType=single&title=com.ebay.shared.finding.cassini.extended.SortOptionsBuilder$BestMatchSortOptionBuilder$BestMatchParameterExtractor.extractFrom&dtOverride=3
+['0', '0', '20866', '28334', '28218']
+

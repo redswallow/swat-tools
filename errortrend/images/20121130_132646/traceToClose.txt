@@ -1,0 +1,112 @@
+2012-11-30 13:27:01 PDSRV15291224 java.util.concurrent.ThreadPoolExecutor$AbortPolicy.rejectedExecution_RejectedExecutionException cmosprovsvc 0
+None
+[0, 0, 0, 0, 0, 0, 0]
+
+2012-11-30 13:27:28 PDSRV15894804 com.ebay.kernel.service.invocation.client.http.nio.NioAsyncHttpClientImpl.send r1srpmr 0
+None
+[0, 0, 0, 0, 0, 0, 0]
+
+2012-11-30 13:27:30 PDSRV15900252 com.ebay.shared.finding.cassini.extended.SortOptionsBuilder$BestMatchSortOptionBuilder$BestMatchParameterExtractor.extractFrom v3buyingsvc2core 77418
+http://sj-sre002.sjc.ebay.com:8080/ex/c/trend?trendType=error&poolName=v3buyingsvc2core&fromDate=2012-11-22+22%3A27&toDate=2012-11-29+22%3A27&poolId=115034&id=1835043&subType=single&title=com.ebay.shared.finding.cassini.extended.SortOptionsBuilder$BestMatchSortOptionBuilder$BestMatchParameterExtractor.extractFrom&dtOverride=3
+['0', '0', '0', '20866', '28334', '28218']
+
+2012-11-30 13:27:44 PDSRV15931706 com.ebay.raptor.viewitem.web.beans.ViewItemPageModel.getsModel r1viewitem 0
+None
+[0, 0, 0, 0, 0, 0, 0]
+
+2012-11-30 13:27:47 PDSRV15950872 com.ebay.raptor.search.srp.pres.shared.conduit.SearchPageModel.getCenterPanelModel r1srpmr 0
+None
+[0, 0, 0, 0, 0, 0, 0]
+
+2012-11-30 13:27:47 PDSRV15990986 com.ebay.raptor.kernel.context.impl.RaptorCookieProvider.updateCookieFromMetadata r1widgets 0
+None
+[0, 0, 0, 0, 0, 0, 0]
+
+2012-11-30 13:27:52 PDSRV16019882 com.ebay.maestro.core.engine.runtime.CorticonRuleEngineImpl.deployDecisionService_CcServerFileOrDirNotFoundException v3mdssoa3core 0
+None
+[0, 0, 0, 0, 0, 0, 0]
+
+2012-11-30 13:28:12 PDSRV16118208 com.ebay.merch.engine.biz.core.NuMEPlacementAlgoStrategyExecutorTask.validateMandatoryInputs_NuMENormalizationException v3numecore 0
+None
+[0, 0, 0, 0, 0, 0, 0]
+
+2012-11-30 13:28:15 PDSRV16163106 com.ebay.services.ratelimiterservice.impl.RateLimiterServiceImpl.createRequest v3apisignincore 0
+None
+[0, 0, 0, 0, 0, 0, 0]
+
+2012-11-30 13:28:19 PDSRV16168478 com.ebay.services.ratelimiterservice.impl.RateLimiterServiceImpl.createRequest v3mobipdscore 0
+None
+[0, 0, 0, 0, 0, 0, 0]
+
+2012-11-30 13:28:21 PDSRV16163108 com.ebay.services.ratelimiterservice.impl.RateLimiterServiceImpl.createRequest v3apimsgcore 0
+None
+[0, 0, 0, 0, 0, 0, 0]
+
+2012-11-30 13:28:22 PDSRV16168480 com.ebay.services.ratelimiterservice.impl.RateLimiterServiceImpl.createRequest v3apilw2core 0
+None
+[0, 0, 0, 0, 0, 0, 0]
+
+2012-11-30 13:28:26 PDSRV16154326 com.ebay.services.ratelimiterservice.impl.RateLimiterServiceImpl.createRequest v3apifindingcore 0
+None
+[0, 0, 0, 0, 0, 0, 0]
+
+2012-11-30 13:28:26 PDSRV16202474 SyncReplicationException zstorecorem1 0
+None
+[0, 0, 0, 0, 0, 0, 0]
+
+2012-11-30 13:28:26 PDSRV16210448 VolumeIdNotFoundException zstorecorem1 0
+None
+[0, 0, 0, 0, 0, 0, 0]
+
+2012-11-30 13:28:31 PDSRV16184212 com.ebay.services.ratelimiterservice.impl.RateLimiterServiceImpl.createRequest v3api6core 0
+None
+[0, 0, 0, 0, 0, 0, 0]
+
+2012-11-30 13:28:31 PDSRV16210450 CustomClosedChannelException zstorecorem1 0
+None
+[0, 0, 0, 0, 0, 0, 0]
+
+2012-11-30 13:28:31 PDSRV16184210 com.ebay.services.ratelimiterservice.impl.RateLimiterServiceImpl.createRequest v3apicore 0
+None
+[0, 0, 0, 0, 0, 0, 0]
+
+2012-11-30 13:28:31 PDSRV16202472 com.ebay.services.ratelimiterservice.impl.RateLimiterServiceImpl.createRequest v3buyingsvccore 0
+None
+[0, 0, 0, 0, 0, 0, 0]
+
+2012-11-30 13:28:31 PDSRV16055758 com.ebay.apiratelimiter.biz.helper.ApiRateLimiterHelper.findItemStatsRecordIfNotFoundInsert v3api5uni 0
+None
+[0, 0, 0, 0, 0, 0, 0]
+
+2012-11-30 13:28:32 PDSRV16249570 IOException zstorecorem1 0
+None
+[0, 0, 0, 0, 0, 0, 0]
+
+2012-11-30 13:28:37 PDSRV16240676 com.ebay.sbe.feeder.transformation.function.item.base.GPSCordinates.invoke_NullPointerException v3bessearchcore 0
+None
+[0, 0, 0, 0, 0, 0, 0]
+
+2012-11-30 13:28:37 PDSRV16258486 com.ebay.shared.finding.query.CassiniConstraintVisitor$VariableEvaluator.eval_QueryPolicyException v3buyingsvc2core 0
+None
+[0, 0, 0, 0, 0, 0, 0]
+
+2012-11-30 13:28:49 PDSRV16284088 com.ebay.prodinfra.atlas.service.business.adapter.themistobo.ThemisPublishProductsResponse2AtlasBusinessExceptionAdapter.doAdap v3atlascore 0
+None
+[0, 0, 0, 0, 0, 0, 0]
+
+2012-11-30 13:28:54 PDSRV16277238 com.ebay.client.tracking.service.handler.SocialMediaWhiteListCache.isSocialMediaSearchUrl r1srukde 0
+None
+[0, 0, 0, 0, 0, 0, 0]
+
+2012-11-30 13:29:02 PDSRV16299310 com.ebay.kernel.service.invocation.client.http.nio.NioAsyncHttpClientImpl.send v3besitem1core 0
+None
+[0, 0, 0, 0, 0, 0, 0]
+
+2012-11-30 13:29:07 PDSRV16194390 com.ebay.services.ratelimiterservice.impl.RateLimiterServiceImpl.createRequest v3api5uni 0
+None
+[0, 0, 0, 0, 0, 0, 0]
+
+2012-11-30 13:29:20 PDSRV16317186 ApplicationAuthenticator v3apifindingcore 0
+None
+[0, 0, 0, 0, 0, 0, 0]
+
