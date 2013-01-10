@@ -42,11 +42,8 @@ def get_error_trend_json(pool_name,title):
     url=EX_JSON_URL.replace("[poolname]",pool_name)
     #print url
     #log(pool_name)
-    print "url before"
     page=urllib2.urlopen(url).read()
-    print "url ok"
     json_val=json.loads(page)
-    print "loads ok"
     max_count=0
     new_url=None
     for line in json_val['aaData']:

@@ -2,11 +2,10 @@ import time
 
 def runTime(func):  
     def newFunc(*args, **kwargs):  
-        start = time.time()  
-        print "@%s, {%s} start" % (time.strftime("%X", time.localtime()), func.__name__)  
+        start = time.clock()  
+        print "%s [%s] START" % (time.strftime("%X", time.localtime()), func.__name__)  
         back = func(*args, **kwargs)  
-        print "@%s, {%s} end" % (time.strftime("%X", time.localtime()), func.__name__)  
-        print "@%.3fs taken for {%s}" % (time.time() - start, func.__name__)  
+        print "%s [%s] ENDING %.3fs" % (time.strftime("%X", time.localtime()), func.__name__,time.clock() - start)  
         return back  
     return newFunc  
 
