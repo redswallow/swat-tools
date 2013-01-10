@@ -1,0 +1,9 @@
+{
+  "name": "exgraph",
+  "version": "0.1",
+  "manifest_version": 2,
+  "description": "Made by Redswallow",
+  "content_scripts":[
+  {"matches":["http://sre.vip.ebay.com/ex/c/*"],"js":["content_script/jquery.js","content_script/dygraph-debug.js","content_script/trend.js","content_script/graph.js"],"run_at":"document_end"}
+  ]
+}
