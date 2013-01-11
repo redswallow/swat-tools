@@ -2,20 +2,14 @@ import xlrd,urllib2,re,simplejson as json,os,time,threading,Queue
 import getopt,sys
 from runtime import runTime
 from logger import log
-from BeautifulSoup import BeautifulSoup
+from libs import *
+from config import *
+from plot import *
+from matplotlib.pyplot import ylim
 
-import numpy as np  
-import matplotlib  
-matplotlib.use('Agg')  
-from matplotlib.pyplot import fill_between,plot,savefig,figure,title,ylim
-
-"""configuration"""
-XLS_FILE="grid.xls"
-INIT_URL="http://sj-sre002.sjc.ebay.com:8080/ex/c/trend"
-EX_URL_H="http://sj-sre002.sjc.ebay.com:8080/ex/c/trend?trendType=error&poolName=[poolname]&dtOverride=2"
-EX_URL_D="http://sj-sre002.sjc.ebay.com:8080/ex/c/trend?trendType=error&poolName=[poolname]&dtOverride=3"
-EX_URL=EX_URL_D
-EX_JSON_URL=EX_URL.replace("trend?", "trend/detailJSON?");
+"""global settings"""
+c = config.Config()
+foldername=time.strftime('%Y%m%d_%H%M%S', time.localtime())
 queue=Queue.Queue()
 cell_elements=[]
 lock = threading.Lock()  
@@ -34,12 +28,12 @@ def read_xls(filename):
     return cell_elements
 
 def get_error_trend_url(pool_name,title):
-    url=EX_URL.replace("[poolname]",pool_name)
+    url=c.url['ex_url'].replace("[poolname]",pool_name)
     log("log.txt",url)
 
 @runTime
 def get_error_trend_json(pool_name,title):
-    url=EX_JSON_URL.replace("[poolname]",pool_name)
+    url=c.url['ex_json_url'].replace("[poolname]",pool_name)
     #print url
     #log(pool_name)
     page=urllib2.urlopen(url).read()
@@ -48,17 +42,19 @@ def get_error_trend_json(pool_name,title):
     new_url=None
     for line in json_val['aaData']:
         if title in line[0] and line[3]>max_count:
-            new_url=INIT_URL+re.findall(r"'(.*?)'",line[0])[0]
+            new_url=c.url['init_url']+re.findall(r"'(.*?)'",line[0])[0]
             max_count=line[3]
     return new_url
 
-def get_chrome_image(url):
+def open_web_page(url):
     command="chrome "+'"'+url+'"'
     log("log.txt",command)
     os.system(command)
-    #page=urllib2.urlopen(url).read()
-    #file=open("image.txt","w")
-    #file.write(page)
+
+def save_web_page(url):
+    page=urllib2.urlopen(url).read()
+    file=open("image.txt","w")
+    file.write(page)
 
 def get_chart_data(url):
     page=urllib2.urlopen(url).read()
@@ -66,34 +62,20 @@ def get_chart_data(url):
     if charJsonFinder:
         charJson=eval(charJsonFinder[0].replace('&#034;','\''))
         data=charJson['d'][0]['y']['v']
-        return data
+        return [int(num) for num in data]
     else:
         return None
 
-def get_image(url,element):
+def save_image(url,element):
     task_id,error_type,title,pool_name,assignee=element
-    image_title=task_id+' '+title+' '+pool_name
+    image_title=''.join((task_id,title,pool_name))
     y=get_chart_data(url) if url else [0]*6 
-    
-    sumy=0
-    threshold=50000;thresholdFlag=True
-    for num in y:
-        if int(num)>threshold: thresholdFlag=False
-        sumy+=int(num)
-    #draw the graphs
-    fig = figure()
-    x=np.arange(0,len(y),1)
+    x=range(0,len(y))
+    threshold=50000
+    thresholdFlag=True if max(y)<threshold else False
+    Plotter.save_image(Plotter.get_image(x,y,thresholdFlag=thresholdFlag),foldername,image_title)
     if thresholdFlag:
-        ylim([0,threshold])
-    color_alpha=str(np.exp(-sumy/(threshold*7)));
-    plot(x,y,color='k',lw=2)
-    fill_between(x,y,0,color=color_alpha)
-    fig.savefig('images/%s/%s.png'%(folder,image_title))
-    
-    if thresholdFlag:
-        log("images/%s/traceToClose.txt"%folder,'%s %d\n%s\n%s\n' % (image_title,sumy,url,y))
-        #get_chrome_image(url)
-
+        log("images/%s/traceToClose.txt"%foldername,'%s %d\n%s\n%s\n' % (image_title,sum(y),url,y))
 
 def init_threading():
     for i in xrange(10):
@@ -102,9 +84,7 @@ def init_threading():
         t.start() 
 
 def init():
-    global folder
-    folder=time.strftime('%Y%m%d_%H%M%S', time.localtime())
-    os.makedirs('images/%s'%folder)
+    os.makedirs('images/%s'%foldername)
 
     options,remainder=getopt.getopt(sys.argv, 'ws')
     for opt,arg in options:
@@ -137,7 +117,7 @@ if __name__=='__main__':
     init()
     """create threads"""
     init_threading()
-    cell_elements=read_xls(XLS_FILE)
+    cell_elements=read_xls(c.file['xls_file'])
     for element in cell_elements:
         if element[1]=='SWAT Top10 Errors': #and element[4]=='yualiu':
             queue.put(element)
