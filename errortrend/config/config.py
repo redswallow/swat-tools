@@ -11,6 +11,8 @@ class Config():
         self._parser.read(self.filename)
         self.file=self.get_section('file')
         self.url=self.get_section('url')
+        self.image=self.get_section('image')
+        self.thread=self.get_section('thread')
     
     def get_section(self,section):
         """Load configuration section"""
