@@ -65,7 +65,7 @@ def get_chart_data(url):
 
 def save_image(url,element):
     task_id,error_type,title,pool_name,assignee=element
-    image_title=''.join((task_id,title,pool_name))
+    image_title=' '.join((task_id,title,pool_name))
     y=get_chart_data(url) if url else [0]*6 
     x=range(0,len(y))
     thresholdFlag=True if max(y)<int(c.image['threshold']) else False
