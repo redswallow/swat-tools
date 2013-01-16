@@ -161,3 +161,12 @@ pip-log.txt
 
 # Mac crap
 .DS_Store
+
+############
+## SWATtools
+############
+*.xls
+*.png
+errortrend/log.txt
+errortrend/images
+xlsdiff/log.txt
