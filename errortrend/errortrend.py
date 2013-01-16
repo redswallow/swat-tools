@@ -28,7 +28,7 @@ def get_graphjson_url(pool_name,title):
     return c.url['ex_json_url']%(pool_name,title)
 
 @runTime
-def get_error_trend_json(url):
+def get_y_axis(url):
     page=urllib2.urlopen(url).read()
     json_data=json.loads(page)
     if json_data['d'][0]['y']['v']:
@@ -43,17 +43,18 @@ def open_web_page(url,broswer):
 
 @runTime
 def save_image(url,filename):
-    y=get_error_trend_json(url) 
+    #get x,y from graphjson url
+    y=get_y_axis(url) 
     x=range(0,len(y))
     thresholdFlag=True if max(y)<int(c.image['threshold']) else False
+    #build/save image
     Plotter.save_image(Plotter.get_image(x,y,thresholdFlag=thresholdFlag),c.image['filename']%(foldername,filename))
     if thresholdFlag:
         logger.log(c.image['log']%foldername,'%s %d\n%s\n%s\n' % (filename,sum(y),url,y))
 
 def running_task():
     #grabs task_id,error_type,title,pool_name from queue
-    element=queue.get()
-    task_id,error_type,title,pool_name,assignee=element
+    task_id,error_type,title,pool_name,assignee=queue.get()
     if lock.acquire():
         url=get_graphjson_url(pool_name,title)
         image_title=' '.join((task_id,title,pool_name))
