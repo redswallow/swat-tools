@@ -28,11 +28,12 @@ def read_xls(filename):
 def get_error_trend_url(pool_name,title):
     url=c.url['ex_url'].replace("[poolname]",pool_name)
     log("log.txt",url)
+    return url
 
 @runTime
 def get_error_trend_json(pool_name,title):
     #get error trend url
-    url=c.url['ex_json_url'].replace("[poolname]",pool_name)
+    url=get_error_trend_url(pool_name,title)
     page=urllib2.urlopen(url).read()
     json_val=json.loads(page)
     max_count=0
