@@ -1,6 +1,5 @@
-import xlrd,urllib2,simplejson as json,os,time,Queue
+import xlrd,urllib2,simplejson as json,os,time,Queue,logger
 from runtime import runTime
-from logger import log
 from libs import *
 from config import *
 from plot import *
@@ -39,7 +38,7 @@ def get_error_trend_json(url):
 
 def open_web_page(url,broswer):
     command=' '.join((broswer,url))
-    log("log.txt",command)
+    logger.log("log.txt",command)
     os.system(command)
 
 @runTime
@@ -49,7 +48,7 @@ def save_image(url,filename):
     thresholdFlag=True if max(y)<int(c.image['threshold']) else False
     Plotter.save_image(Plotter.get_image(x,y,thresholdFlag=thresholdFlag),c.image['filename']%(foldername,filename))
     if thresholdFlag:
-        log(c.image['log']%foldername,'%s %d\n%s\n%s\n' % (filename,sum(y),url,y))
+        logger.log(c.image['log']%foldername,'%s %d\n%s\n%s\n' % (filename,sum(y),url,y))
 
 def running_task():
     #grabs task_id,error_type,title,pool_name from queue
