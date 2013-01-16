@@ -1,4 +1,4 @@
-import xlrd,urllib2,re,simplejson as json,os,time,Queue
+import xlrd,urllib2,simplejson as json,os,time,Queue
 from runtime import runTime
 from logger import log
 from libs import *
@@ -47,9 +47,9 @@ def save_image(url,filename):
     y=get_error_trend_json(url) 
     x=range(0,len(y))
     thresholdFlag=True if max(y)<int(c.image['threshold']) else False
-    Plotter.save_image(Plotter.get_image(x,y,thresholdFlag=thresholdFlag),foldername,filename)
+    Plotter.save_image(Plotter.get_image(x,y,thresholdFlag=thresholdFlag),c.image['filename']%(foldername,filename))
     if thresholdFlag:
-        log("images/%s/traceToClose.txt"%foldername,'%s %d\n%s\n%s\n' % (filename,sum(y),url,y))
+        log(c.image['log']%foldername,'%s %d\n%s\n%s\n' % (filename,sum(y),url,y))
 
 def running_task():
     #grabs task_id,error_type,title,pool_name from queue
