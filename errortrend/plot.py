@@ -14,9 +14,9 @@ class Plotter():
         return image
 
     @classmethod
-    def save_image(self,image,folder,title):
+    def save_image(self,image,filename):
         try:
-            image.savefig('images/%s/%s.png'%(folder,title))
+            image.savefig(filename)
         except IOError,e:
             print("open exception: %s: %s\n" %(e.errno, e.strerror))  
             return -1
