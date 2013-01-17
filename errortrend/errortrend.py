@@ -1,4 +1,4 @@
-import xlrd,urllib2,simplejson as json,os,time,Queue,logger
+import urllib2,simplejson as json,os,time,Queue,logger,tickets
 from runtime import runTime
 from libs import *
 from config import *
@@ -10,22 +10,8 @@ c = config.Config()
 foldername=time.strftime('%Y%m%d_%H%M%S', time.localtime())
 queue=Queue.Queue()
 
-@runTime
-def read_xls(filename):
-    cell_elements=[]
-    book = xlrd.open_workbook(filename)
-    booksheet = book.sheet_by_index(0)
-    for rows in xrange(1, booksheet.nrows, 1):
-        task_id=booksheet.cell_value(rows,0)
-        assignee=booksheet.cell_value(rows,6)
-        title=booksheet.cell_value(rows,7)
-        title=title.replace(" -- ","--").replace(" --","--");
-        if "PDSRV" in task_id:
-            cell_elements.append([task_id]+title.split("--")+[assignee])
-    return cell_elements
-
-def get_graphjson_url(pool_name,title):
-    return c.url['ex_json_url']%(pool_name,title)
+def get_graphjson_url(pool_name,error_name):
+    return c.url['ex_json_url']%(pool_name,error_name)
 
 @runTime
 def get_y_axis(url):
@@ -53,12 +39,13 @@ def save_image(url,filename):
         logger.log(c.image['log']%foldername,'%s %d\n%s\n%s\n' % (filename,sum(y),url,y))
 
 def running_task():
-    #grabs task_id,error_type,title,pool_name from queue
-    task_id,error_type,title,pool_name,assignee=queue.get()
+    #grabs task_id,error_name,pool_name,assignee from queue
+    task_id,error_name,pool_name,assignee=queue.get()
     if lock.acquire():
-        url=get_graphjson_url(pool_name,title)
-        image_title=' '.join((task_id,title,pool_name))
-        save_image(url,image_title)
+        url=get_graphjson_url(pool_name,error_name)
+        filename=' '.join((task_id,error_name,pool_name))
+        print filename
+        save_image(url,filename)
         lock.release()
     #signals to queue job is done
     queue.task_done()
@@ -71,8 +58,7 @@ def init():
 
 if __name__=='__main__':
     init()
-    excel_data=read_xls(c.file['xls_file'])
-    for element in excel_data:
-        if element[1]=='SWAT Top10 Errors':
-            queue.put(element)
+    elements=tickets.read_tickets(c.file['txt_file'])
+    for element in elements:
+        queue.put(element)
     queue.join()
