@@ -168,5 +168,7 @@ pip-log.txt
 *.xls
 *.png
 errortrend/log.txt
+errortrend/tickets.txt
+errortrend/debug.html
 errortrend/images
 xlsdiff/log.txt
