@@ -1,4 +1,4 @@
-import urllib2,simplejson as json,os,time,Queue,logger,tickets
+import urllib2,simplejson as json,os,time,re,Queue,logger,tickets
 from runtime import runTime
 from libs import *
 from config import *
@@ -10,8 +10,24 @@ c = config.Config()
 foldername=time.strftime('%Y%m%d_%H%M%S', time.localtime())
 queue=Queue.Queue()
 
-def get_graphjson_url(pool_name,error_name):
-    return c.url['ex_json_url']%(pool_name,error_name)
+def get_graphjson_url(pool_name,error_name,id):
+    return c.url['graphjson']%(pool_name,error_name,id)
+
+def get_detailjson_url(pool_name):
+    return c.url['detailjson']%(pool_name)
+
+@runTime
+def get_error_id(pool_name,error_name):
+    url= get_detailjson_url(pool_name)
+    page=urllib2.urlopen(url).read()
+    json_data=json.loads(page)
+    regex=re.compile(r'id=(\d+)')
+    max=0;id=None
+    for item in json_data['aaData']:
+        if error_name in item[0] and item[3]>max:
+            id=regex.findall(item[0])[0]
+            max=item[3]
+    return id
 
 @runTime
 def get_y_axis(url):
@@ -39,10 +55,11 @@ def save_image(url,filename):
         logger.log(c.image['log']%foldername,'%s %d\n%s\n%s\n' % (filename,sum(y),url,y))
 
 def running_task():
-    #grabs task_id,error_name,pool_name,assignee from queue
+    #grabs task_id,error_name,pex_url_hool_name,assignee from queue
     task_id,error_name,pool_name,assignee=queue.get()
     if lock.acquire():
-        url=get_graphjson_url(pool_name,error_name)
+        error_id=get_error_id(pool_name,error_name)
+        url=get_graphjson_url(pool_name,error_name,error_id)
         filename=' '.join((task_id,error_name,pool_name))
         print filename
         save_image(url,filename)
