@@ -55,13 +55,13 @@ def save_image(url,filename):
         logger.log(c.image['log']%foldername,'%s %d\n%s\n%s\n' % (filename,sum(y),url,y))
 
 def running_task():
-    #grabs task_id,error_name,pex_url_hool_name,assignee from queue
-    task_id,error_name,pool_name,assignee=queue.get()
+    #grabs task_id,error_name,pool_name,assignee from queue
     if lock.acquire():
+        task_id,error_name,pool_name,assignee=queue.get()
         error_id=get_error_id(pool_name,error_name)
         url=get_graphjson_url(pool_name,error_name,error_id)
         filename=' '.join((task_id,error_name,pool_name))
-        print filename
+        logger.log("log.txt",filename)
         save_image(url,filename)
         lock.release()
     #signals to queue job is done
